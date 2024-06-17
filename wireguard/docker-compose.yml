@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  wireguard:
+    image: linuxserver/wireguard  # Docker image to use for WireGuard
+    container_name: wireguard  # Name of the container
+    cap_add:
+      - NET_ADMIN  # Add NET_ADMIN capability for networking operations
+      - SYS_MODULE  # Add SYS_MODULE capability for module loading
+    environment:
+      - PUID=1000  # User ID for file permissions inside the container
+      - PGID=1000  # Group ID for file permissions inside the container
+      - TZ=Europe/London  # Timezone setting
+      - SERVERURL=yourdomain.com  # Optional: URL for server configuration
+      - SERVERPORT=51820  # Optional: Port for WireGuard server
+      - PEERS=1  # Optional: Number of peers allowed
+      - PEERDNS=auto  # Optional: Configure peer DNS settings
+      - INTERNAL_SUBNET=10.13.13.0  # Optional: Internal subnet configuration
+    volumes:
+      - /path/to/wireguard/config:/config  # Mount host directory to container for WireGuard configuration
+      - /lib/modules:/lib/modules  # Mount host modules to container for kernel modules
+    ports:
+      - 51820:51820/udp  # Map host port 51820 to container UDP port 51820
+    sysctls:
+      - net.ipv4.conf.all.src_valid_mark=1  # Set sysctl for IPv4 source valid mark
+    restart: always  # Always restart the container if it stops
+    healthcheck:  # Configure health check for the container
+      test: ["CMD", "pgrep", "wireguard"]  # Command to check if WireGuard process is running
+      interval: 1m30s  # Interval between health checks
+      timeout: 10s  # Timeout for each health check
+      retries: 3  # Number of retries before considering the container unhealthy
+      start_period: 40s  # Delay before starting health checks after container startup
