@@ -1,0 +1,30 @@
+version: '3.8'  # Define the version of Docker Compose
+
+services:
+  mysql:
+    image: mysql:latest  # Use the latest MySQL image from Docker Hub
+    container_name: mysql  # Name the container "mysql"
+    
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword  # Set the root password for MySQL
+      MYSQL_DATABASE: mydatabase  # Create a MySQL database with the name "mydatabase"
+      MYSQL_USER: myuser  # Create a MySQL user
+      MYSQL_PASSWORD: mypassword  # Set the password for the MySQL user
+    
+    volumes:
+      - mysql-data:/var/lib/mysql  # Persist MySQL data using a named volume
+    
+    ports:
+      - "3306:3306"  # Map port 3306 on the host to port 3306 on the container
+    
+    restart: always  # Always restart the container if it stops
+    
+    healthcheck:  # Configure health check for the MySQL container
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]  # Command to check if MySQL is ready
+      interval: 1m  # Interval between health checks (1 minute)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 5  # Number of retries before marking the container as unhealthy
+      start_period: 30s  # Wait time before starting health checks after the container starts
+
+volumes:
+  mysql-data:  # Define a named volume "mysql-data" to persist MySQL data
