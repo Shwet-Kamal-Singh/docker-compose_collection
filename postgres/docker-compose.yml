@@ -1,0 +1,29 @@
+version: '3.8'  # Define the version of Docker Compose
+
+services:
+  postgres:
+    image: postgres:latest  # Use the latest PostgreSQL image from Docker Hub
+    container_name: postgres  # Name the container "postgres"
+    
+    environment:
+      POSTGRES_USER: myuser  # Set the PostgreSQL user
+      POSTGRES_PASSWORD: mypassword  # Set the password for the PostgreSQL user
+      POSTGRES_DB: mydatabase  # Create a PostgreSQL database with the name "mydatabase"
+    
+    volumes:
+      - pgdata:/var/lib/postgresql/data  # Persist PostgreSQL data using a named volume
+    
+    ports:
+      - "5432:5432"  # Map port 5432 on the host to port 5432 on the container
+    
+    restart: always  # Always restart the container if it stops
+    
+    healthcheck:  # Configure health check for the PostgreSQL container
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]  # Command to check if PostgreSQL is ready
+      interval: 1m  # Interval between health checks (1 minute)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 5  # Number of retries before marking the container as unhealthy
+      start_period: 30s  # Wait time before starting health checks after the container starts
+
+volumes:
+  pgdata:  # Define a named volume "pgdata" to persist PostgreSQL data
