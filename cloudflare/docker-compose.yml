@@ -1,0 +1,22 @@
+version: '3.8'  # Define the version of Docker Compose
+
+services:
+  cloudflare-ddns:
+    image: oznu/cloudflare-ddns:latest  # Use the latest Cloudflare DDNS image from Docker Hub
+    container_name: cloudflare-ddns  # Name the container "cloudflare-ddns"
+    
+    environment:
+      PROXIED: "true"  # Set to "true" if you want Cloudflare to proxy traffic (orange cloud)
+      ZONE: example.com  # Your Cloudflare zone (domain)
+      SUBDOMAIN: sub.example.com  # The subdomain to update
+      API_KEY: your_cloudflare_api_key  # Your Cloudflare API key
+      EMAIL: your_email@example.com  # Your Cloudflare account email
+    
+    restart: always  # Always restart the container if it stops
+    
+    healthcheck:  # Configure health check for the Cloudflare DDNS container
+      test: ["CMD-SHELL", "curl -f http://localhost:8000 || exit 1"]  # Command to check if the service is running
+      interval: 1m  # Interval between health checks (1 minute)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 5  # Number of retries before marking the container as unhealthy
+      start_period: 30s  # Wait time before starting health checks after the container starts
