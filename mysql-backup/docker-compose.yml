@@ -1,0 +1,55 @@
+version: '3.8'  # Define the version of Docker Compose
+
+services:
+  mysql:
+    image: mysql:latest  # Use the latest MySQL image from Docker Hub
+    container_name: mysql  # Name the container "mysql"
+    
+    environment:
+      MYSQL_ROOT_PASSWORD: examplepassword  # Set the root password for MySQL
+      MYSQL_DATABASE: exampledb  # Set the default database name
+      MYSQL_USER: exampleuser  # Set the default user
+      MYSQL_PASSWORD: exampleuserpassword  # Set the password for the default user
+
+    volumes:
+      - mysql_data:/var/lib/mysql  # Persist MySQL data
+    
+    restart: always  # Always restart the container if it stops
+
+    healthcheck:  # Configure health check for the MySQL container
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u root -pexamplepassword || exit 1"]  # Command to check if MySQL is running
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+      start_period: 30s  # Wait time before starting health checks after the container starts
+
+  mysql-backup:
+    image: mysql:latest  # Use the latest MySQL image from Docker Hub
+    container_name: mysql-backup  # Name the container "mysql-backup"
+    
+    environment:
+      MYSQL_ROOT_PASSWORD: examplepassword  # Set the root password for MySQL
+      MYSQL_DATABASE: exampledb  # Set the default database name
+      MYSQL_USER: exampleuser  # Set the default user
+      MYSQL_PASSWORD: exampleuserpassword  # Set the password for the default user
+
+    volumes:
+      - mysql_backup:/backup  # Mount a volume for backups
+    
+    depends_on:
+      - mysql  # Ensure the MySQL container is started before this one
+    
+    command: bash -c "mkdir -p /backup && mysqldump -u root -pexamplepassword exampledb > /backup/backup.sql"  # Backup command
+    
+    restart: always  # Always restart the container if it stops
+    
+    healthcheck:  # Configure health check for the MySQL Backup container
+      test: ["CMD-SHELL", "[ -f /backup/backup.sql ] || exit 1"]  # Command to check if the backup file exists
+      interval: 1h  # Interval between health checks (1 hour)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+      start_period: 30s  # Wait time before starting health checks after the container starts
+
+volumes:
+  mysql_data:  # Define a named volume for MySQL data
+  mysql_backup:  # Define a named volume for MySQL backups
