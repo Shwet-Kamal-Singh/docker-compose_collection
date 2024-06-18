@@ -1,0 +1,28 @@
+version: '3.8'  # Define the version of Docker Compose
+
+services:
+  mongodb:
+    image: mongo:latest  # Use the latest MongoDB image from Docker Hub
+    container_name: mongodb  # Name the container "mongodb"
+    
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root  # Set the root username for MongoDB
+      MONGO_INITDB_ROOT_PASSWORD: example  # Set the root password for MongoDB
+    
+    volumes:
+      - mongo-data:/data/db  # Persist MongoDB data using a named volume
+    
+    ports:
+      - "27017:27017"  # Map port 27017 on the host to port 27017 on the container
+    
+    restart: always  # Always restart the container if it stops
+    
+    healthcheck:  # Configure health check for the MongoDB container
+      test: ["CMD", "mongo", "--eval", "db.runCommand({ ping: 1 })"]  # Command to check if MongoDB is ready
+      interval: 1m  # Interval between health checks (1 minute)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 5  # Number of retries before marking the container as unhealthy
+      start_period: 30s  # Wait time before starting health checks after the container starts
+
+volumes:
+  mongo-data:  # Define a named volume "mongo-data" to persist MongoDB data
