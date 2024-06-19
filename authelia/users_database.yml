@@ -1,0 +1,7 @@
+# Define the users database
+users:
+  # Username
+  user:
+    password: "$argon2id$v=19$m=65536,t=2,p=1$examplehash$examplesalt"  # Password hash
+    displayname: "User"  # Display name of the user
+    email: "user@example.com"  # Email address of the user

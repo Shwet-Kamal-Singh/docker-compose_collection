@@ -1,0 +1,25 @@
+version: '3.8'  # Define the version of Docker Compose
+
+services:
+  authelia:
+    image: authelia/authelia:latest  # Use the latest Authelia image from Docker Hub
+    container_name: authelia  # Name the container "authelia"
+
+    volumes:
+      - ./configuration.yml:/etc/authelia/configuration.yml  # Mount the configuration file
+      - ./users_database.yml:/etc/authelia/users_database.yml  # Mount the users database file
+
+    ports:
+      - "9091:9091"  # Map port 9091 on the host to port 9091 on the container
+
+    restart: always  # Always restart the container if it stops
+
+    healthcheck:  # Configure health check for the Authelia container
+      test: ["CMD-SHELL", "curl --fail http://localhost:9091/api/health || exit 1"]  # Command to check if Authelia is running
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+      start_period: 30s  # Wait time before starting health checks after the container starts
+
+volumes:
+  authelia_data:  # Define a named volume for Authelia data

@@ -1,0 +1,30 @@
+# Define the Authelia configuration
+host: 0.0.0.0  # Authelia listens on all network interfaces
+port: 9091  # Authelia listens on port 9091
+
+log:
+  level: debug  # Set the log level to debug
+  format: text  # Set the log format to text
+
+authentication_backend:
+  file:
+    path: /etc/authelia/users_database.yml  # Path to the users database file
+
+access_control:
+  default_policy: deny  # Default policy is to deny access
+  rules:
+    - domain: example.com  # Domain to apply the rule to
+      policy: one_factor  # Require one-factor authentication
+
+session:
+  name: authelia_session  # Name of the session cookie
+  secret: a_very_secret_key  # Secret key for encrypting the session
+  expiration: 1h  # Session expiration time
+
+storage:
+  local:
+    path: /var/lib/authelia/storage  # Path to store data locally
+
+notifier:
+  filesystem:
+    filename: /var/lib/authelia/notification.txt  # Path to the notification file
