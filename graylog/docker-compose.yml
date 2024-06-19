@@ -1,0 +1,59 @@
+version: '3.8'  # Define the version of Docker Compose
+
+services:
+  mongo:
+    image: mongo:4.2  # Use the MongoDB image
+    container_name: mongo  # Name the container "mongo"
+    restart: always  # Always restart the container if it stops
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2  # Use the Elasticsearch OSS image
+    container_name: elasticsearch  # Name the container "elasticsearch"
+    environment:
+      - http.host=0.0.0.0
+      - transport.host=127.0.0.1
+      - network.host=0.0.0.0
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"  # Set the JVM heap size
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es_data:/usr/share/elasticsearch/data  # Mount a named volume for Elasticsearch data
+    restart: always  # Always restart the container if it stops
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200 || exit 1"]  # Command to check if Elasticsearch is running
+      interval: 1m  # Interval between health checks (1 minute)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+      start_period: 30s  # Wait time before starting health checks after the container starts
+
+  graylog:
+    image: graylog/graylog:4.1  # Use the Graylog image
+    container_name: graylog  # Name the container "graylog"
+    environment:
+      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper  # Set a secret used for password hashing
+      - GRAYLOG_ROOT_PASSWORD_SHA2=<hashed_password>  # Set the SHA2 hash of the root password
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/  # Set the external URI for Graylog
+    entrypoint: "/usr/bin/tini -- wait-for-it elasticsearch:9200 -- /docker-entrypoint.sh"  # Ensure Elasticsearch is up before starting Graylog
+    depends_on:
+      - mongo
+      - elasticsearch
+    volumes:
+      - graylog_data:/usr/share/graylog/data  # Mount a named volume for Graylog data
+      - ./config/graylog.conf:/usr/share/graylog/data/config/graylog.conf:ro  # Mount the Graylog configuration file
+      - ./config/log4j2.xml:/usr/share/graylog/data/config/log4j2.xml:ro  # Mount the Log4j2 configuration file
+    ports:
+      - "9000:9000"  # Map port 9000 on the host to port 9000 on the container
+      - "12201:12201"  # Map port 12201 for GELF UDP input
+    restart: always  # Always restart the container if it stops
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9000/api/system/lbstatus || exit 1"]  # Command to check if Graylog is running
+      interval: 1m  # Interval between health checks (1 minute)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+      start_period: 30s  # Wait time before starting health checks after the container starts
+
+volumes:
+  es_data:  # Define a named volume for Elasticsearch data
+  graylog_data:  # Define a named volume for Graylog data
