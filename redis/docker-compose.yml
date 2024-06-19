@@ -1,0 +1,24 @@
+version: '3.8'  # Define the version of Docker Compose
+
+services:
+  redis:
+    image: redis:latest  # Use the latest Redis image from Docker Hub
+    container_name: redis  # Name the container "redis"
+    
+    ports:
+      - "6379:6379"  # Map port 6379 on the host to port 6379 on the container
+    
+    volumes:
+      - redis-data:/data  # Mount a named volume for Redis data persistence
+    
+    restart: always  # Always restart the container if it stops
+    
+    healthcheck:  # Configure health check for the Redis container
+      test: ["CMD", "redis-cli", "ping"]  # Command to check if Redis is running
+      interval: 1m  # Interval between health checks (1 minute)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+      start_period: 30s  # Wait time before starting health checks after the container starts
+
+volumes:
+  redis-data:  # Define a named volume for Redis data
