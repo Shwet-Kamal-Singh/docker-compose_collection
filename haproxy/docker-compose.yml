@@ -1,0 +1,23 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  haproxy:
+    image: haproxy:latest  # Use the latest HAProxy image
+    container_name: haproxy_container  # Name the container "haproxy_container"
+    ports:
+      - "80:80"  # Map port 80 on the host to port 80 on the container
+      - "443:443"  # Map port 443 on the host to port 443 on the container
+    restart: always  # Always restart the container if it stops
+    healthcheck:
+      test: ["CMD", "haproxy", "-c", "-f", "/usr/local/etc/haproxy/haproxy.cfg"]  # Health check command to verify HAProxy configuration
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+    volumes:
+      - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro  # Mount the HAProxy configuration file as read-only
+
+# Optional volumes section if additional data or configurations are needed
+# volumes:
+#   haproxy_data:
+#     driver: local
+
