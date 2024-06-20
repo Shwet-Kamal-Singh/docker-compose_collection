@@ -1,0 +1,20 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  centos:
+    image: centos:latest  # Use the latest CentOS image
+    container_name: centos_container  # Name the container "centos_container"
+    command: tail -f /dev/null  # Keep the container running by executing a long-running command
+    restart: always  # Always restart the container if it stops
+    healthcheck:
+      test: ["CMD-SHELL", "ping -c 1 google.com || exit 1"]  # Command to check if the container can reach the internet
+      interval: 1m  # Interval between health checks (1 minute)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+      start_period: 30s  # Wait time before starting health checks after the container starts
+    volumes:
+      - ./data:/data  # Mount a local directory to the container
+    environment:
+      - ENV_VAR=example  # Example environment variable
+    ports:
+      - "8080:80"  # Map port 8080 on the host to port 80 on the container
