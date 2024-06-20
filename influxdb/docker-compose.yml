@@ -1,0 +1,25 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  influxdb:
+    image: influxdb:latest  # Use the latest InfluxDB image
+    container_name: influxdb_container  # Name the container "influxdb_container"
+    ports:
+      - "8086:8086"  # Map port 8086 on the host to port 8086 on the container
+    restart: always  # Always restart the container if it stops
+    healthcheck:
+      test: ["CMD-SHELL", "influx ping -host http://localhost:8086"]  # Health check command to verify InfluxDB is responding
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+    volumes:
+      - influxdb_data:/var/lib/influxdb2  # Mount a volume for InfluxDB data persistence
+      - ./config/influxdb.conf:/etc/influxdb/influxdb.conf:ro  # Mount the InfluxDB configuration file as read-only
+    environment:
+      - INFLUXDB_DB=mydatabase  # Set the name of the default database
+      - INFLUXDB_ADMIN_USER=admin  # Set the admin user
+      - INFLUXDB_ADMIN_PASSWORD=adminpassword  # Set the admin password
+      - INFLUXDB_HTTP_AUTH_ENABLED=true  # Enable HTTP authentication
+
+volumes:
+  influxdb_data:  # Define a named volume for InfluxDB data
