@@ -1,0 +1,19 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  grafana:
+    image: grafana/grafana:latest  # Use the latest Grafana image
+    container_name: grafana_container  # Name the container "grafana_container"
+    ports:
+      - "3000:3000"  # Map port 3000 on the host to port 3000 on the container
+    restart: always  # Always restart the container if it stops
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/login"]  # Health check command to verify Grafana is accessible
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+    volumes:
+      - grafana_data:/var/lib/grafana  # Mount a volume for Grafana data persistence
+
+volumes:
+  grafana_data:  # Define a named volume for Grafana data
