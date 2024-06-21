@@ -1,0 +1,20 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  portainer:
+    image: portainer/portainer-ce:latest  # Use the latest Portainer CE image
+    container_name: portainer_container  # Name the container "portainer_container"
+    ports:
+      - "9000:9000"  # Map port 9000 on the host to port 9000 on the container for Portainer UI
+    restart: always  # Always restart the container if it stops
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000"]  # Health check command to verify Portainer UI is accessible
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock  # Mount Docker socket for managing Docker
+      - ./data:/data  # Mount the 'data' directory as '/data' in the container
+
+volumes:
+  portainer_data:  # Define a named volume for Portainer data
