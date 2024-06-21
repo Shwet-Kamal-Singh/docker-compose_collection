@@ -1,0 +1,23 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  java_app:
+    image: openjdk:latest  # Use the latest OpenJDK image
+    container_name: java_app_container  # Name the container "java_app_container"
+    ports:
+      - "8080:8080"  # Map port 8080 on the host to port 8080 on the container
+    restart: always  # Always restart the container if it stops
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]  # Health check command to verify the Java application is running
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+    volumes:
+      - ./app:/usr/src/app  # Mount the application directory
+    working_dir: /usr/src/app  # Set the working directory in the container
+    command: ["java", "-jar", "your-app.jar"]  # Command to run the Java application
+
+# Optional volumes section if additional data or configurations are needed
+# volumes:
+#   java_app_data:
+#     driver: local
