@@ -1,0 +1,19 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  prometheus:
+    image: prom/prometheus:latest  # Use the latest Prometheus image
+    container_name: prometheus_container  # Name the container "prometheus_container"
+    ports:
+      - "9090:9090"  # Map port 9090 on the host to port 9090 on the container
+    restart: always  # Always restart the container if it stops
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9090/-/ready | grep '\"status\":\"success\"'"]  # Health check command to verify Prometheus is ready
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+    volumes:
+      - prometheus_data:/prometheus  # Mount a volume for Prometheus data persistence
+
+volumes:
+  prometheus_data:  # Define a named volume for Prometheus data
