@@ -1,0 +1,30 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  pihole:
+    image: pihole/pihole:latest  # Use the latest Pi-hole image
+    container_name: pihole_container  # Name the container "pihole_container"
+    environment:
+      TZ: 'America/Los_Angeles'  # Set the timezone
+      WEBPASSWORD: 'your_password'  # Set the web interface password
+    volumes:
+      - './etc-pihole:/etc/pihole'  # Persist Pi-hole data
+      - './etc-dnsmasq.d:/etc/dnsmasq.d'  # Persist dnsmasq configuration
+    ports:
+      - "53:53/tcp"  # DNS over TCP
+      - "53:53/udp"  # DNS over UDP
+      - "80:80/tcp"  # Web interface over HTTP
+      - "443:443/tcp"  # Web interface over HTTPS
+    restart: always  # Always restart the container if it stops
+    cap_add:
+      - NET_ADMIN  # Required for network configuration
+    healthcheck:
+      test: ["CMD-SHELL", "dig +short @127.0.0.1 pi.hole || exit 1"]  # Health check command to verify Pi-hole is running
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+
+# Optional volumes section if additional data or configurations are needed
+# volumes:
+#   pihole_data:
+#     driver: local
