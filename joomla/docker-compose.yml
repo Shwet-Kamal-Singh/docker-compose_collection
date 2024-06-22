@@ -1,0 +1,44 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  joomla:
+    image: joomla:latest  # Use the latest Joomla image
+    container_name: joomla_container  # Name the container "joomla_container"
+    ports:
+      - "8080:80"  # Map port 8080 on the host to port 80 on the container
+    restart: always  # Always restart the container if it stops
+    environment:
+      JOOMLA_DB_HOST: db  # Set the database host to the "db" service
+      JOOMLA_DB_USER: joomla  # Set the database user
+      JOOMLA_DB_PASSWORD: example  # Set the database password
+      JOOMLA_DB_NAME: joomla  # Set the database name
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]  # Health check command to verify Joomla is running
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+    volumes:
+      - joomla_data:/var/www/html  # Mount the Joomla data directory
+
+  db:
+    image: mysql:5.7  # Use the MySQL 5.7 image
+    container_name: joomla_db_container  # Name the container "joomla_db_container"
+    environment:
+      MYSQL_ROOT_PASSWORD: example  # Set the root password for MySQL
+      MYSQL_DATABASE: joomla  # Set the database name
+      MYSQL_USER: joomla  # Set the database user
+      MYSQL_PASSWORD: example  # Set the database user password
+    volumes:
+      - db_data:/var/lib/mysql  # Mount the MySQL data directory
+    restart: always  # Always restart the container if it stops
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "--silent"]  # Health check command to verify MySQL is running
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+
+volumes:
+  joomla_data:
+    driver: local  # Use a local volume for Joomla data
+  db_data:
+    driver: local  # Use a local volume for MySQL data
