@@ -1,0 +1,37 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  loki:
+    image: grafana/loki:latest  # Use the latest Loki image
+    container_name: loki  # Name the container "loki"
+    ports:
+      - "3100:3100"  # Map port 3100 on the host to port 3100 on the container
+    restart: always  # Always restart the container if it stops
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yaml  # Mount the Loki configuration file
+      - ./daemon.new.json:/etc/loki/daemon.json  # Mount the Loki daemon configuration file
+      - loki_data:/loki  # Mount a volume for Loki data
+    command: -config.file=/etc/loki/local-config.yaml  # Command to start Loki with the specified config file
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:3100/ready"]  # Health check command to verify Loki is running
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+
+  promtail:
+    image: grafana/promtail:latest  # Use the latest Promtail image
+    container_name: promtail  # Name the container "promtail"
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/config.yml  # Mount the Promtail configuration file
+      - /var/log:/var/log  # Mount the host's log directory
+    restart: always  # Always restart the container if it stops
+    command: -config.file=/etc/promtail/config.yml  # Command to start Promtail with the specified config file
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "http://localhost:9080/ready"]  # Health check command to verify Promtail is running
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+
+volumes:
+  loki_data:
+    driver: local  # Use a local volume for Loki data

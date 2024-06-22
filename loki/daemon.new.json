@@ -1,0 +1,49 @@
+{
+    // Limits configuration
+    "limits_config": {
+      // Maximum number of streams per user
+      "max_streams_per_user": 0
+    },
+    // Storage configuration
+    "storage_config": {
+      // Type of storage to use
+      "boltdb_shipper": {
+        // Directory for active index files
+        "active_index_directory": "/loki/boltdb-shipper-active",
+        // Shared store for index files
+        "shared_store": "filesystem"
+      }
+    },
+    // Schema configuration
+    "schema_config": {
+      // Current schema version
+      "configs": [
+        {
+          // Start date for the schema
+          "from": "2020-10-24",
+          // Index type
+          "index": {
+            "period": "24h",
+            "prefix": "index_"
+          },
+          // Object store type
+          "object_store": "filesystem",
+          // Schema version
+          "schema": "v11",
+          // Store type
+          "store": "boltdb-shipper"
+        }
+      ]
+    },
+    // Ruler configuration
+    "ruler_config": {
+      // Directory for rule storage
+      "storage": {
+        "type": "local",
+        "local": {
+          "directory": "/loki/rules"
+        }
+      }
+    }
+  }
+  
