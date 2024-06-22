@@ -1,0 +1,35 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  plex:
+    image: plexinc/pms-docker:latest  # Use the latest Plex Media Server image
+    container_name: plex_container  # Name the container "plex_container"
+    environment:
+      TZ: 'America/Los_Angeles'  # Set the timezone
+      PLEX_CLAIM: 'your_plex_claim_token'  # Plex claim token for automatic server sign-in
+    volumes:
+      - './config:/config'  # Persist Plex configuration data
+      - './transcode:/transcode'  # Persist transcoding data
+      - './data:/data'  # Mount your media data directory
+    ports:
+      - "32400:32400/tcp"  # Plex web interface and primary access port
+      - "3005:3005/tcp"  # Plex clients
+      - "8324:8324/tcp"  # Plex Smart TVs
+      - "32469:32469/tcp"  # Plex DLNA
+      - "1900:1900/udp"  # Plex DLNA Discovery
+      - "32410:32410/udp"  # Plex GDM network discovery
+      - "32412:32412/udp"  # Plex GDM network discovery
+      - "32413:32413/udp"  # Plex GDM network discovery
+      - "32414:32414/udp"  # Plex GDM network discovery
+    restart: always  # Always restart the container if it stops
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:32400/ || exit 1"]  # Health check command to verify Plex is running
+      interval: 1m  # Interval between health checks (1 minute)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+      start_period: 1m  # Start period for the health check (1 minute)
+
+# Optional volumes section if additional data or configurations are needed
+# volumes:
+#   plex_data:
+#     driver: local
