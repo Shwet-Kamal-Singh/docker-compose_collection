@@ -1,0 +1,23 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  python_app:
+    image: python:latest  # Use the latest Python image
+    container_name: python_app_container  # Name the container "python_app_container"
+    ports:
+      - "5000:5000"  # Map port 5000 on the host to port 5000 on the container
+    restart: always  # Always restart the container if it stops
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5000/health || exit 1"]  # Health check command to verify the Python application is running
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+    volumes:
+      - ./app:/usr/src/app  # Mount the application directory
+    working_dir: /usr/src/app  # Set the working directory in the container
+    command: ["python", "app.py"]  # Command to run the Python application
+
+# Optional volumes section if additional data or configurations are needed
+# volumes:
+#   python_app_data:
+#     driver: local
