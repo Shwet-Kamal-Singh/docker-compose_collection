@@ -1,0 +1,21 @@
+version: '3.8'  # Specify the version of Docker Compose
+
+services:
+  ubuntu_service:
+    image: ubuntu:latest  # Use the latest Ubuntu image
+    container_name: ubuntu_service_container  # Name the container "ubuntu_service_container"
+    restart: always  # Always restart the container if it stops
+    healthcheck:
+      test: ["CMD-SHELL", "echo 'health check'"]  # Health check command to verify the container is running
+      interval: 30s  # Interval between health checks (30 seconds)
+      timeout: 10s  # Timeout for each health check (10 seconds)
+      retries: 3  # Number of retries before marking the container as unhealthy
+    volumes:
+      - ./scripts:/usr/local/scripts  # Mount the scripts directory
+    working_dir: /usr/local/scripts  # Set the working directory in the container
+    command: ["bash", "script.sh"]  # Command to run a script (replace "script.sh" with your script name)
+
+# Optional volumes section if additional data or configurations are needed
+# volumes:
+#   ubuntu_service_data:
+#     driver: local
