@@ -1,0 +1,37 @@
+{
+    "url": "http://your-domain.com",
+    "server": {
+      "port": 2368,
+      "host": "0.0.0.0"
+    },
+    "database": {
+      "client": "mysql",
+      "connection": {
+        "host": "mysql",
+        "user": "ghost",
+        "password": "your_ghost_password",
+        "database": "ghost"
+      }
+    },
+    "mail": {
+      "transport": "SMTP",
+      "options": {
+        "service": "Mailgun",
+        "host": "smtp.mailgun.org",
+        "port": 587,
+        "secureConnection": false,
+        "auth": {
+          "user": "your_mailgun_username",
+          "pass": "your_mailgun_password"
+        }
+      }
+    },
+    "logging": {
+      "level": "info",
+      "transports": ["stdout"]
+    },
+    "paths": {
+      "contentPath": "/var/lib/ghost/content"
+    }
+  }
+  
