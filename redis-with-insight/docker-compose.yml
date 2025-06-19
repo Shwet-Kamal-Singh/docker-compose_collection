@@ -1,0 +1,37 @@
+services:
+  redis:
+    image: redis:latest
+    container_name: redis-server
+    command: sh -c "redis-server --appendonly yes --requirepass \"$REDIS_PASSWORD\""
+    volumes:
+      - ./data/redis:/data
+    ports:
+      - "${REDIS_PORT}:6379"
+    restart: unless-stopped
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - redis_net
+
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight-ui
+    ports:
+      - "${REDISINSIGHT_PORT}:5540"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5540"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    networks:
+      - redis_net
+
+networks:
+  redis_net:
+    driver: bridge
